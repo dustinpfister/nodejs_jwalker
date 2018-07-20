@@ -1,4 +1,4 @@
 let jWalk = require('./index.js');
 
 
-jWalk({root:'./'});
+jWalk({root:'./',depth:2});

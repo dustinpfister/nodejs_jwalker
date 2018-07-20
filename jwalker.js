@@ -61,7 +61,11 @@ let readDirRecursive = function (dir, curDepth, maxDepth) {
                 // if dir
                 if (stats.isDirectory()) {
 
-                    readDirRecursive(itemPath, nextDepth, maxDepth);
+                    if (curDepth < maxDepth || maxDepth === -1) {
+
+                        readDirRecursive(itemPath, nextDepth, maxDepth);
+
+                    }
 
                 } else {
 
