@@ -24,6 +24,7 @@ let readDir = function (dir) {
 
 };
 
+// get the stats
 let readStats = function (itemPath) {
 
     return new Promise((resolve, reject) => {
@@ -53,27 +54,49 @@ let readDirRecursive = function (opt, dir, curDepth, maxDepth) {
 
         items.forEach(function (item) {
 
-            let itemPath = path.join(dir, item),
-            nextDepth = curDepth + 1;
+            let nextDepth = curDepth + 1,
+            api = {
+                path: path.join(dir, item),
+                fs: fs,
+                item: {}
+            };
 
             // read stats
-            readStats(itemPath).then(function (stats) {
+            readStats(api.path).then(function (stats) {
+
+                api.isDir = stats.isDirectory();
+                api.stats = stats;
+                api.level = curDepth;
+                api.content = null;
+                api.fs = fs;
 
                 // call forItem
-                opt.forItem({
+                if (opt.read) {
 
-                    path: itemPath,
-                    dir: stats.isDirectory(),
-                    stats: stats
+                    // read contents
+                    fs.readFile(api.path, function (e, data) {
 
-                });
+                        if (data) {
+                            api.data = data;
+                            opt.forItem.call(api, api);
+
+                        }
+
+                    });
+
+                } else {
+
+                    // else just give the item
+                    opt.forItem.call(api, api);
+
+                }
 
                 // if dir
                 if (stats.isDirectory()) {
 
                     if (curDepth < maxDepth || maxDepth === -1) {
 
-                        readDirRecursive(opt, itemPath, nextDepth, maxDepth);
+                        readDirRecursive(opt, api.path, nextDepth, maxDepth);
 
                     }
 
