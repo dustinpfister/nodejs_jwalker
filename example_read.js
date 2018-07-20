@@ -5,7 +5,7 @@ jWalk({
     read: true
 }, function (item) {
 
-    console.log(item.level + ':' + item.path);
+    console.log(item.path);
     console.log(item.data);
 
 });

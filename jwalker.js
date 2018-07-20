@@ -56,29 +56,31 @@ let readDirRecursive = function (opt, dir, curDepth, maxDepth) {
 
             let nextDepth = curDepth + 1,
             api = {
-                path: path.join(dir, item),
                 fs: fs,
-                item: {}
+                item: {
+                    path: path.join(dir, item),
+                    filename: path.basename(path.join(dir, item))
+                }
             };
 
             // read stats
-            readStats(api.path).then(function (stats) {
+            readStats(api.item.path).then(function (stats) {
 
-                api.isDir = stats.isDirectory();
-                api.stats = stats;
-                api.level = curDepth;
-                api.content = null;
-                api.fs = fs;
+                api.item.isDir = stats.isDirectory();
+                api.item.stats = stats;
+                api.item.level = curDepth;
+                api.item.data = null;
+
 
                 // call forItem
                 if (opt.read) {
 
                     // read contents
-                    fs.readFile(api.path, function (e, data) {
+                    fs.readFile(api.item.path, function (e, data) {
 
                         if (data) {
-                            api.data = data;
-                            opt.forItem.call(api, api);
+                            api.item.data = data;
+                            opt.forItem.call(api, api.item);
 
                         }
 
@@ -87,7 +89,7 @@ let readDirRecursive = function (opt, dir, curDepth, maxDepth) {
                 } else {
 
                     // else just give the item
-                    opt.forItem.call(api, api);
+                    opt.forItem.call(api, api.item);
 
                 }
 
@@ -96,7 +98,7 @@ let readDirRecursive = function (opt, dir, curDepth, maxDepth) {
 
                     if (curDepth < maxDepth || maxDepth === -1) {
 
-                        readDirRecursive(opt, api.path, nextDepth, maxDepth);
+                        readDirRecursive(opt, api.item.path, nextDepth, maxDepth);
 
                     }
 
