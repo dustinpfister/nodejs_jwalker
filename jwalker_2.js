@@ -76,12 +76,21 @@ let forItem = function (opt, item) {
 
         });
 
-        // if dir
-        if (stats.isDirectory()) {
+        // find next level
+        let nextLevel = opt.level + 1;
 
-            walk(Object.assign({}, opt, {
-                    root: itemPath
-                }));
+        // if level is less than maxLevel, or the no maxLevel flag of -1 is set
+        if (opt.level < opt.maxLevel || opt.maxLevel === -1) {
+
+            // if dir
+            if (stats.isDirectory()) {
+
+                walk(Object.assign({}, opt, {
+                        root: itemPath,
+                        level: nextLevel
+                    }));
+
+            }
 
         }
 
@@ -110,8 +119,8 @@ let walk = function (opt, forItem) {
     opt = opt || {};
 
     opt.root = path.resolve(opt.root || process.cwd());
-    opt.level = opt.level || 0;
-    opt.maxLevel = opt.maxLevel || -1;
+    opt.level = opt.level === undefined ? 0 : opt.level;
+    opt.maxLevel = opt.level === undefined ? -1 : opt.maxLevel;
     opt.forItem = opt.forItem || forItem || function (item) {
         console.log(item);
     };
@@ -129,12 +138,32 @@ let walk = function (opt, forItem) {
 
 };
 
-walk(process.cwd(), function (item) {
+/*
+walk('./', function (item) {
 
-    // only log javaScript files
-    if (item.ext === '.js') {
+console.log('level: ' + this.level + ' : ' + item.filename)
 
-        console.log(item);
+});
+
+walk('./', function (item) {
+
+// only log javaScript files
+if (item.ext === '.js') {
+
+console.log(item);
+
+}
+
+});
+ */
+
+walk({
+
+    root: './',
+    maxLevel: 0,
+    forItem: function (item) {
+
+        console.log('level: ' + this.level + ' : ' + item.filename)
 
     }
 
