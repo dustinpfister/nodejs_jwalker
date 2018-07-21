@@ -2,11 +2,11 @@ let fs = require('fs'),
 path = require('path');
 
 // use fs.readDir to get the contents of the given dir
-let readDir = function (dir) {
+let readDir = (dir) => {
 
     return new Promise((resolve, reject) => {
 
-        fs.readdir(dir, function (e, contents) {
+        fs.readdir(dir, (e, contents) => {
 
             if (e) {
 
@@ -25,11 +25,11 @@ let readDir = function (dir) {
 };
 
 // get the stats of the given item path
-let readStats = function (itemPath) {
+let readStats = (itemPath) => {
 
     return new Promise((resolve, reject) => {
 
-        fs.stat(itemPath, function (e, stats) {
+        fs.stat(itemPath, (e, stats) => {
 
             if (e) {
 
@@ -48,9 +48,9 @@ let readStats = function (itemPath) {
 };
 
 // what to do for all items
-let forAllItems = function (opt, items) {
+let forAllItems = (opt, items) => {
 
-    items.forEach(function (item) {
+    items.forEach((item) => {
 
         forItem(opt, item);
 
@@ -59,12 +59,12 @@ let forAllItems = function (opt, items) {
 };
 
 // what to do for a single item
-let forItem = function (opt, item) {
+let forItem = (opt, item) => {
 
     let itemPath = path.join(opt.root, item);
 
     // read stats
-    readStats(itemPath).then(function (stats) {
+    readStats(itemPath).then((stats) => {
 
         // the api
         let api = {
@@ -77,7 +77,7 @@ let forItem = function (opt, item) {
 
                 let api = this;
 
-                return fs.readFile(api.item.path, function (e, data) {
+                return fs.readFile(api.item.path, (e, data) => {
 
                     if (e) {
 
@@ -113,7 +113,7 @@ let forItem = function (opt, item) {
 
         };
 
-        opt.forItem.call(api, api.item);
+        opt.onItem.call(api, api.item);
 
         // find next level
         let nextLevel = opt.level + 1;
@@ -133,16 +133,16 @@ let forItem = function (opt, item) {
 
         }
 
-    }).catch (function (e) {
+    }).catch ((e) => {
 
-        opt.forError.call(opt, e, item);
+        opt.onError.call(opt, e, item);
 
     });
 
 };
 
 // walk
-let walk = function (opt, forItem, forError) {
+let walk = (opt, onItem, onError) => {
 
     // if opt is a string
     if (typeof opt === 'string') {
@@ -159,10 +159,10 @@ let walk = function (opt, forItem, forError) {
     opt.root = path.resolve(opt.root || process.cwd());
     opt.level = opt.level === undefined ? 0 : opt.level;
     opt.maxLevel = opt.level === undefined ? -1 : opt.maxLevel;
-    opt.forItem = opt.forItem || forItem || function (item) {
+    opt.onItem = opt.onItem || onItem || function (item) {
         console.log(item);
     };
-    opt.forError = opt.forError || forError || function (e) {
+    opt.onError = opt.onError || onError || function (e) {
 
         console.log(e);
 
@@ -173,9 +173,9 @@ let walk = function (opt, forItem, forError) {
 
         forAllItems(opt, items);
 
-    }).catch (function (e) {
+    }).catch ((e) => {
 
-        opt.forError.call(opt, e);
+        opt.onError.call(opt, e);
 
     });
 
@@ -213,7 +213,7 @@ walk({
 
 root: './',
 maxLevel: 0,
-forItem: function (item) {
+onItem: function (item) {
 
 //console.log('level: ' + this.opt.level + ' : ' + item.filename)
 
@@ -223,7 +223,7 @@ console.log(this.item);
 console.log('********** **** **********');
 
 },
-forError: function (e, item) {
+onError: function (e, item) {
 
 console.log('********** ERROR **********');
 
