@@ -66,26 +66,54 @@ let forItem = function (opt, item) {
     // read stats
     readStats(itemPath).then(function (stats) {
 
-        // the item object
-        let itemObj = {
-
-            path: itemPath,
-            filename: item,
-            ext: path.extname(item).toLowerCase(),
-            isDir: stats.isDirectory()
-
-        },
-
         // the api
-        api = {
+        let api = {
 
             opt: opt,
             fs: fs,
-            item: itemObj
+
+            // read file convenience method
+            read: function (cb) {
+
+                let api = this;
+
+                return fs.readFile(api.item.path, function (e, data) {
+
+                    if (e) {
+
+                        cb(e, null);
+
+                    }
+
+                    if (data) {
+
+                        let ext = api.item.ext;
+
+                        if (ext === '.js' || ext === '.html' || ext === '.css') {
+
+                            data = data.toString();
+
+                        }
+
+                        cb(null, data);
+
+                    }
+
+                });
+
+            },
+            item: {
+
+                path: itemPath,
+                filename: item,
+                ext: path.extname(item).toLowerCase(),
+                isDir: stats.isDirectory()
+
+            }
 
         };
 
-        opt.forItem.call(api, itemObj);
+        opt.forItem.call(api, api.item);
 
         // find next level
         let nextLevel = opt.level + 1;
@@ -159,47 +187,57 @@ walk('./', function (item) {
 console.log('level: ' + this.opt.level + ' : ' + item.filename)
 
 });
+ */
 
 walk('./', function (item) {
 
-// only log javaScript files
-if (item.ext === '.js') {
+    // only log javaScript files
+    if (item.ext === '.js') {
+
+        this.read(function (e, js) {
+
+            if (js) {
+
+                console.log(js);
+
+            }
+
+        });
+
+    }
+
+});
+
+/*
+walk({
+
+root: './',
+maxLevel: 0,
+forItem: function (item) {
+
+//console.log('level: ' + this.opt.level + ' : ' + item.filename)
+
+console.log('********** item **********');
+console.log(this.opt);
+console.log(this.item);
+console.log('********** **** **********');
+
+},
+forError: function (e, item) {
+
+console.log('********** ERROR **********');
+
+console.log(e.message);
+
+if (item) {
 
 console.log(item);
 
 }
 
-});
- */
+console.log('********** ***** **********');
 
-walk({
-
-    root: './',
-    maxLevel: 0,
-    forItem: function (item) {
-
-        //console.log('level: ' + this.opt.level + ' : ' + item.filename)
-
-        console.log('********** item **********');
-        console.log(this.opt);
-        console.log(this.item);
-        console.log('********** **** **********');
-
-    },
-    forError: function (e, item) {
-
-        console.log('********** ERROR **********');
-
-        console.log(e.message);
-
-        if (item) {
-
-            console.log(item);
-
-        }
-
-        console.log('********** ***** **********');
-
-    }
+}
 
 });
+*/
