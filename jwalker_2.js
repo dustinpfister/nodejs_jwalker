@@ -66,12 +66,21 @@ let forItem = function (opt, item) {
     // read stats
     readStats(itemPath).then(function (stats) {
 
-        console.log(itemPath);
+        //console.log(itemPath);
+
+        opt.forItem.call(opt, {
+
+            path: itemPath,
+            filename: item,
+            ext: path.extname(item).toLowerCase()
+
+        });
 
         // if dir
         if (stats.isDirectory()) {
 
-            walk(itemPath);
+            opt.root = itemPath;
+            walk(opt);
 
         }
 
@@ -99,11 +108,11 @@ let walk = function (opt, forItem) {
 
     opt = opt || {};
 
-    opt.root = opt.root || process.cwd();
-    opt.level = opt.level || 0;
-    opt.maxLevel = opt.maxLevel || -1;
+    opt.root = path.resolve(opt.root || process.cwd());
+    //opt.level = opt.level || 0;
+    //opt.maxLevel = opt.maxLevel || -1;
     opt.forItem = opt.forItem || forItem || function (item) {
-        console.log(item);
+        console.log('foo');
     };
 
     // read dir, and call forAll items
@@ -119,4 +128,13 @@ let walk = function (opt, forItem) {
 
 };
 
-walk(process.cwd());
+walk(process.cwd(), function (item) {
+
+    // only log javaScript files
+    if (item.ext === '.js') {
+
+        console.log(item);
+
+    }
+
+});
