@@ -79,8 +79,9 @@ let forItem = function (opt, item) {
         // if dir
         if (stats.isDirectory()) {
 
-            opt.root = itemPath;
-            walk(opt);
+            walk(Object.assign({}, opt, {
+                    root: itemPath
+                }));
 
         }
 
@@ -109,10 +110,10 @@ let walk = function (opt, forItem) {
     opt = opt || {};
 
     opt.root = path.resolve(opt.root || process.cwd());
-    //opt.level = opt.level || 0;
-    //opt.maxLevel = opt.maxLevel || -1;
+    opt.level = opt.level || 0;
+    opt.maxLevel = opt.maxLevel || -1;
     opt.forItem = opt.forItem || forItem || function (item) {
-        console.log('foo');
+        console.log(item);
     };
 
     // read dir, and call forAll items
