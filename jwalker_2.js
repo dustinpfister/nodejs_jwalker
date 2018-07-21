@@ -66,15 +66,26 @@ let forItem = function (opt, item) {
     // read stats
     readStats(itemPath).then(function (stats) {
 
-        //console.log(itemPath);
-
-        opt.forItem.call(opt, {
+        // the item object
+        let itemObj = {
 
             path: itemPath,
             filename: item,
-            ext: path.extname(item).toLowerCase()
+            ext: path.extname(item).toLowerCase(),
+            isDir: stats.isDirectory()
 
-        });
+        },
+
+        // the api
+        api = {
+
+            opt: opt,
+            fs: fs,
+            item: itemObj
+
+        };
+
+        opt.forItem.call(api, itemObj);
 
         // find next level
         let nextLevel = opt.level + 1;
@@ -145,7 +156,7 @@ let walk = function (opt, forItem, forError) {
 /*
 walk('./', function (item) {
 
-console.log('level: ' + this.level + ' : ' + item.filename)
+console.log('level: ' + this.opt.level + ' : ' + item.filename)
 
 });
 
@@ -167,7 +178,12 @@ walk({
     maxLevel: 0,
     forItem: function (item) {
 
-        console.log('level: ' + this.level + ' : ' + item.filename)
+        //console.log('level: ' + this.opt.level + ' : ' + item.filename)
+
+        console.log('********** item **********');
+        console.log(this.opt);
+        console.log(this.item);
+        console.log('********** **** **********');
 
     },
     forError: function (e, item) {
