@@ -158,7 +158,7 @@ let walk = (opt, onItem, onError) => {
     opt = opt || {};
     opt.root = path.resolve(opt.root || process.cwd());
     opt.level = opt.level === undefined ? 0 : opt.level;
-    opt.maxLevel = opt.level === undefined ? -1 : opt.maxLevel;
+    opt.maxLevel = opt.maxLevel === undefined ? -1 : opt.maxLevel;
     opt.onItem = opt.onItem || onItem || function (item) {
         console.log(item);
     };
@@ -181,32 +181,32 @@ let walk = (opt, onItem, onError) => {
 
 };
 
+walk('./', function (item) {
+
+    console.log('level: ' + this.opt.level + ' : ' + item.filename);
+
+});
+
 /*
 walk('./', function (item) {
 
-console.log('level: ' + this.opt.level + ' : ' + item.filename)
+// only log javaScript files
+if (item.ext === '.js') {
+
+this.read(function (e, js) {
+
+if (js) {
+
+console.log(js);
+
+}
+
+});
+
+}
 
 });
  */
-
-walk('./', function (item) {
-
-    // only log javaScript files
-    if (item.ext === '.js') {
-
-        this.read(function (e, js) {
-
-            if (js) {
-
-                console.log(js);
-
-            }
-
-        });
-
-    }
-
-});
 
 /*
 walk({
@@ -214,8 +214,6 @@ walk({
 root: './',
 maxLevel: 0,
 onItem: function (item) {
-
-//console.log('level: ' + this.opt.level + ' : ' + item.filename)
 
 console.log('********** item **********');
 console.log(this.opt);
