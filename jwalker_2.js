@@ -96,14 +96,14 @@ let forItem = function (opt, item) {
 
     }).catch (function (e) {
 
-        console.log(e);
+        opt.forError.call(opt, e, item);
 
     });
 
 };
 
 // walk
-let walk = function (opt, forItem) {
+let walk = function (opt, forItem, forError) {
 
     // if opt is a string
     if (typeof opt === 'string') {
@@ -117,12 +117,16 @@ let walk = function (opt, forItem) {
     }
 
     opt = opt || {};
-
     opt.root = path.resolve(opt.root || process.cwd());
     opt.level = opt.level === undefined ? 0 : opt.level;
     opt.maxLevel = opt.level === undefined ? -1 : opt.maxLevel;
     opt.forItem = opt.forItem || forItem || function (item) {
         console.log(item);
+    };
+    opt.forError = opt.forError || forError || function (e) {
+
+        console.log(e);
+
     };
 
     // read dir, and call forAll items
@@ -132,7 +136,7 @@ let walk = function (opt, forItem) {
 
     }).catch (function (e) {
 
-        console.log(e);
+        opt.forError.call(opt, e);
 
     });
 
@@ -164,6 +168,21 @@ walk({
     forItem: function (item) {
 
         console.log('level: ' + this.level + ' : ' + item.filename)
+
+    },
+    forError: function (e, item) {
+
+        console.log('********** ERROR **********');
+
+        console.log(e.message);
+
+        if (item) {
+
+            console.log(item);
+
+        }
+
+        console.log('********** ***** **********');
 
     }
 
